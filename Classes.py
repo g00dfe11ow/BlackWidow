@@ -31,6 +31,8 @@ from extractors.Urls import extract_urls
 from extractors.Iframes import extract_iframes
 from extractors.Ui_forms import extract_ui_forms
 
+import prettytable as pt
+
 
 import logging
 log_file = os.path.join(os.getcwd(), 'logs', 'crawl-'+str(time.time())+'.log')
@@ -540,11 +542,16 @@ class Crawler:
                             n_forms += 1
                         elif edge.value.method == "event":
                             n_events += 1
+                # print()
+                # print("----------------------")
+                # print("GETS    | FROMS  | EVENTS ")
+                # print(str(n_gets).ljust(7), "|", str(n_forms).ljust(6), "|", n_events)
+                # print("----------------------")
+
                 print()
-                print("----------------------")
-                print("GETS    | FROMS  | EVENTS ")
-                print(str(n_gets).ljust(7), "|", str(n_forms).ljust(6), "|", n_events)
-                print("----------------------")
+                table = pt.PrettyTable(['GETS', 'FROMS', 'EVENTS'])
+                table.add_row([n_gets, n_forms, n_events])
+                print(table)
 
                 # for edge in self.graph.edges:
                 #     if edge.visited == False and edge.value.method=="get":
