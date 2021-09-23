@@ -1369,6 +1369,7 @@ class Crawler:
         graph.visit_edge(edge)
 
         # (almost) Never GET twice (optimization)
+        # 图中有边通过GET方法到达与todo中的边相同的节点，则todo中的边标记为已访问
         if edge.value.method == "get":
             for e in graph.edges:
                 if (edge.n2 == e.n2) and (edge != e) and (e.value.method == "get"):
