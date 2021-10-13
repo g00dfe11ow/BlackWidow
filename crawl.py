@@ -30,7 +30,7 @@ driver = webdriver.Chrome(chrome_options = chrome_options)
 
 
 
-#driver.set_window_position(-1700,0)
+# driver.set_window_position(-1700,0)
 
 # Read scripts and add script which will be executed when the page starts loading
 ## JS libraries from JaK crawler, with minor improvements
