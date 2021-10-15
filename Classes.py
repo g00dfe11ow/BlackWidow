@@ -23,6 +23,7 @@ import re
 import time
 import itertools
 import string
+import pickle
 
 from Functions import *
 from extractors.Events import extract_events
@@ -1127,6 +1128,8 @@ class Crawler:
 
                 # Save to file
                 f = open("form_xss.txt", "a+")
+                if not isinstance(form_xss, set):
+                    continue
                 for xss in form_xss:
                     if xss in self.attack_lookup_table:
                         f.write(str(self.attack_lookup_table)  + "\n")
@@ -1155,8 +1158,12 @@ class Crawler:
 
         f = open("successful_xss.txt", "w")
         f.write(str(successful_xss))
+        with open("successful_xss.pickle", "wb") as f:
+            pickle.dump(successful_xss, f)
         f = open("attack_lookup_table.txt", "w")
         f.write(str(self.attack_lookup_table))
+        with open("attack_lookup_table.pickle", "wb") as f:
+            pickle.dump(self.attack_lookup_table, f)
 
         print("ATTACK TABLE\n\n\n\n")
 
