@@ -134,8 +134,7 @@ def find_state(driver, graph, edge):
                     logging.error(e)
                     return False
             else:
-                raise Exception("Can't handle method (%s) in find_state" %
-                                method)
+                raise Exception("Can't handle method (%s) in find_state" % method)
 
     return True
 
@@ -190,16 +189,13 @@ def check_edge(driver, graph, edge):
         graph.data['form_urls'][purl.path] += 1
 
         if graph.data['form_urls'][purl.path] > 10:
-            logging.info(
-                "FROM ACTION URL (path) %s, visited more than 10 times, mark as done"
-                % str(edge.n2.value.url))
+            logging.info("FROM ACTION URL (path) %s, visited more than 10 times, mark as done" % str(edge.n2.value.url))
             return False
         else:
             return True
     elif method == "event":
         if dom_depth(edge) > 10:
-            logging.info("Dom depth (10) reached! Discard edge %s " %
-                         (str(edge)))
+            logging.info("Dom depth (10) reached! Discard edge %s " % (str(edge)))
             return False
         else:
             return True
@@ -245,8 +241,7 @@ def follow_edge(driver, graph, edge):
             edge.visited = True
             return None
     else:
-        raise Exception("Can't handle method (%s) in next_unvisited_edge " %
-                        method)
+        raise Exception("Can't handle method (%s) in next_unvisited_edge " % method)
 
     # Success
     return True
@@ -308,8 +303,7 @@ def allow_edge(graph, edge):
     if so and not bl:
         return True
     else:
-        logging.debug("Different origins %s and %s" %
-                      (str(from_url), str(to_url)))
+        logging.debug("Different origins %s and %s" % (str(from_url), str(to_url)))
         return False
 
 
@@ -326,34 +320,28 @@ def execute_event(driver, do):
             if web_element.is_displayed():
                 web_element.click()
             else:
-                logging.warning(
-                    "Trying to click on invisible element. Use JavaScript")
+                logging.warning("Trying to click on invisible element. Use JavaScript")
                 driver.execute_script("arguments[0].click()", web_element)
         elif do.event == "ondblclick" or do.event == "dblclick":
             web_element = driver.find_element_by_xpath(do.addr)
             logging.info("Double click on %s" % web_element)
             ActionChains(driver).double_click(web_element).perform()
         elif do.event == "onmouseout":
-            logging.info("Mouseout on %s" %
-                         driver.find_element_by_xpath(do.addr))
+            logging.info("Mouseout on %s" % driver.find_element_by_xpath(do.addr))
             driver.find_element_by_xpath(do.addr).click()
             el = driver.find_element_by_xpath(do.addr)
             # TODO find first element in body
             body = driver.find_element_by_xpath("/html/body")
-            ActionChains(driver).move_to_element(el).move_to_element(
-                body).perform()
+            ActionChains(driver).move_to_element(el).move_to_element(body).perform()
         elif do.event == "onmouseover":
-            logging.info("Mouseover on %s" %
-                         driver.find_element_by_xpath(do.addr))
+            logging.info("Mouseover on %s" % driver.find_element_by_xpath(do.addr))
             el = driver.find_element_by_xpath(do.addr)
             ActionChains(driver).move_to_element(el).perform()
         elif do.event == "onmousedown":
-            logging.info("Click (mousedown) on %s" %
-                         driver.find_element_by_xpath(do.addr))
+            logging.info("Click (mousedown) on %s" % driver.find_element_by_xpath(do.addr))
             driver.find_element_by_xpath(do.addr).click()
         elif do.event == "onmouseup":
-            logging.info("Mouseup on %s" %
-                         driver.find_element_by_xpath(do.addr))
+            logging.info("Mouseup on %s" % driver.find_element_by_xpath(do.addr))
             el = driver.find_element_by_xpath(do.addr)
             ActionChains(driver).move_to_element(el).release().perform()
         elif do.event == "change" or do.event == "onchange":
@@ -388,8 +376,7 @@ def execute_event(driver, do):
             el.clear()
             el.send_keys("jAEkPot")
             el.send_keys(Keys.RETURN)
-            logging.info("Composition Start %s" %
-                         driver.find_element_by_xpath(do.addr))
+            logging.info("Composition Start %s" % driver.find_element_by_xpath(do.addr))
 
         else:
             logging.warning("Warning Unhandled event %s " % str(do.event))
@@ -430,8 +417,7 @@ def fuzzy_eq(form1, form2):
 def update_value_with_js(driver, web_element, new_value):
     try:
         new_value = new_value.replace("'", "\\'")
-        driver.execute_script("arguments[0].value = '" + new_value + "'",
-                              web_element)
+        driver.execute_script("arguments[0].value = '" + new_value + "'", web_element)
     except Exception as e:
         logging.error(e)
         logging.error(traceback.format_exc())
@@ -473,8 +459,7 @@ def form_fill(driver, target_form):
                 current_form.action = js_form['action']
 
                 # TODO Need better COMPARE!
-                if (current_form.action == target_form.action
-                        and current_form.method == target_form.method):
+                if (current_form.action == target_form.action and current_form.method == target_form.method):
                     for js_el in js_form['elements']:
                         web_el = driver.find_element_by_xpath(js_el['xpath'])
                         inputs.append(web_el)
@@ -490,25 +475,19 @@ def form_fill(driver, target_form):
                 iel_value = empty2none(iel.get_attribute("value"))
                 if iel.get_attribute("type") == "radio":
                     # RadioElement has a different equal function where value is important
-                    form_iel = Classes.Form.RadioElement(
-                        iel_type, iel_name, iel_value)
+                    form_iel = Classes.Form.RadioElement(iel_type, iel_name, iel_value)
                 elif iel.get_attribute("type") == "checkbox":
-                    form_iel = Classes.Form.CheckboxElement(
-                        iel_type, iel_name, iel_value, None)
+                    form_iel = Classes.Form.CheckboxElement(iel_type, iel_name, iel_value, None)
                 elif iel.get_attribute("type") == "submit":
-                    form_iel = Classes.Form.SubmitElement(
-                        iel_type, iel_name, iel_value, None)
+                    form_iel = Classes.Form.SubmitElement(iel_type, iel_name, iel_value, None)
                 else:
-                    form_iel = Classes.Form.Element(iel_type, iel_name,
-                                                    iel_value)
+                    form_iel = Classes.Form.Element(iel_type, iel_name, iel_value)
                     logging.warning("Default handling for %s " % str(form_iel))
 
                 if form_iel in target_form.inputs:
                     i = target_form.inputs[form_iel]
 
-                    if iel.get_attribute(
-                            "type") == "submit" or iel.get_attribute(
-                                "type") == "image":
+                    if iel.get_attribute("type") == "submit" or iel.get_attribute("type") == "image":
                         submit_buttons.append((iel, i))
                     elif iel.get_attribute("type") == "file":
                         if "/" in i.value:
@@ -517,9 +496,7 @@ def form_fill(driver, target_form):
                             try:
                                 iel.send_keys(form_fill_file(i.value))
                             except Exception as e:
-                                logging.warning(
-                                    "[inputs] Failed to upload file " +
-                                    str(i.value) + " in " + str(form_iel))
+                                logging.warning("[inputs] Failed to upload file " + str(i.value) + " in " + str(form_iel))
                     elif iel.get_attribute("type") == "radio":
                         if i.override_value:
                             update_value_with_js(driver, iel, i.override_value)
@@ -536,49 +513,34 @@ def form_fill(driver, target_form):
                     elif iel.get_attribute("type") in ["text", "email", "url"]:
                         if iel.get_attribute("maxlength"):
                             try:
-                                driver.execute_script(
-                                    "arguments[0].removeAttribute('maxlength')",
-                                    iel)
+                                driver.execute_script("arguments[0].removeAttribute('maxlength')", iel)
                             except Exception as e:
-                                logging.warning(
-                                    "[inputs] faild to change maxlength " +
-                                    str(form_iel))
+                                logging.warning("[inputs] faild to change maxlength " + str(form_iel))
                         try:
                             iel.clear()
                             iel.send_keys(i.value)
                         except Exception as e:
-                            logging.warning("[inputs] faild to send keys to " +
-                                            str(form_iel) +
-                                            " Trying javascript")
+                            logging.warning("[inputs] faild to send keys to " + str(form_iel) + " Trying javascript")
                             try:
-                                driver.execute_script(
-                                    "arguments[0].value = '" + str(i.value) +
-                                    "'", iel)
+                                driver.execute_script("arguments[0].value = '" + str(i.value) + "'", iel)
                             except Exception as e:
                                 logging.error(e)
                                 logging.error(traceback.format_exc())
-                                logging.error("[inputs] also faild with JS " +
-                                              str(form_iel))
+                                logging.error("[inputs] also faild with JS " + str(form_iel))
                     elif iel.get_attribute("type") == "password":
                         try:
                             iel.clear()
                             iel.send_keys(i.value)
                         except Exception as e:
-                            logging.warning("[inputs] faild to send keys to " +
-                                            str(form_iel) +
-                                            " Trying javascript")
+                            logging.warning("[inputs] faild to send keys to " + str(form_iel) + " Trying javascript")
                             update_value_with_js(driver, iel, i.value)
                     else:
-                        logging.warning(
-                            "[inputs] using default clear/send_keys for " +
-                            str(form_iel))
+                        logging.warning("[inputs] using default clear/send_keys for " + str(form_iel))
                         try:
                             iel.clear()
                             iel.send_keys(i.value)
                         except Exception as e:
-                            logging.warning("[inputs] faild to send keys to " +
-                                            str(form_iel) +
-                                            " Trying javascript")
+                            logging.warning("[inputs] faild to send keys to " + str(form_iel) + " Trying javascript")
                             update_value_with_js(driver, iel, i.value)
                 else:
                     logging.warning("[inputs] could NOT FIND " + str(form_iel))
@@ -593,8 +555,7 @@ def form_fill(driver, target_form):
         # <select>
         selects = el.find_elements_by_tag_name("select")
         for select in selects:
-            form_select = Classes.Form.SelectElement(
-                "select", select.get_attribute("name"))
+            form_select = Classes.Form.SelectElement("select", select.get_attribute("name"))
             if form_select in target_form.inputs:
                 i = target_form.inputs[form_select]
                 selenium_select = Select(select)
@@ -607,10 +568,8 @@ def form_fill(driver, target_form):
                             try:
                                 option.click()
                             except Exception as e:
-                                logging.error("Could not click on " +
-                                              str(form_select) + ", trying JS")
-                                update_value_with_js(driver, select,
-                                                     i.selected)
+                                logging.error("Could not click on " + str(form_select) + ", trying JS")
+                                update_value_with_js(driver, select, i.selected)
                             break
             else:
                 logging.warning("[selects] could NOT FIND " + str(form_select))
@@ -618,17 +577,14 @@ def form_fill(driver, target_form):
         # <textarea>
         textareas = el.find_elements_by_tag_name("textarea")
         for ta in textareas:
-            form_ta = Classes.Form.Element(ta.get_attribute("type"),
-                                           ta.get_attribute("name"),
-                                           ta.get_attribute("value"))
+            form_ta = Classes.Form.Element(ta.get_attribute("type"), ta.get_attribute("name"), ta.get_attribute("value"))
             if form_ta in target_form.inputs:
                 i = target_form.inputs[form_ta]
                 try:
                     ta.clear()
                     ta.send_keys(i.value)
                 except Exception as e:
-                    logging.info("[inputs] faild to send keys to " +
-                                 str(form_iel) + " Trying javascript")
+                    logging.info("[inputs] faild to send keys to " + str(form_iel) + " Trying javascript")
                     update_value_with_js(driver, ta, i.value)
             else:
                 logging.warning("[textareas] could NOT FIND " + str(form_ta))
@@ -636,8 +592,7 @@ def form_fill(driver, target_form):
         # <iframes>
         iframes = el.find_elements_by_tag_name("iframe")
         for iframe in iframes:
-            form_iframe = Classes.Form.Element("iframe",
-                                               iframe.get_attribute("id"), "")
+            form_iframe = Classes.Form.Element("iframe", iframe.get_attribute("id"), "")
 
             if form_iframe in target_form.inputs:
                 i = target_form.inputs[form_iframe]
@@ -645,13 +600,11 @@ def form_fill(driver, target_form):
                     iframe_id = i.name
                     driver.switch_to.frame(iframe_id)
                     iframe_body = driver.find_element_by_tag_name("body")
-                    if (iframe_body.get_attribute("contenteditable") == "true"
-                        ):
+                    if (iframe_body.get_attribute("contenteditable") == "true"):
                         iframe_body.clear()
                         iframe_body.send_keys(i.value)
                     else:
-                        logging.error(
-                            "Body not contenteditable, was during parse")
+                        logging.error("Body not contenteditable, was during parse")
 
                     driver.switch_to.default_content()
 
@@ -673,30 +626,20 @@ def form_fill(driver, target_form):
                         selenium_submit.click()
                         break
                     except ElementNotVisibleException as e:
-                        logging.warning(
-                            "Cannot click on invisible submit button: " +
-                            str(submit_button) + str(target_form) +
-                            " trying JavaScript click")
-                        logging.info(
-                            "form_fill Javascript submission of form after failed submit button click"
-                        )
+                        logging.warning("Cannot click on invisible submit button: " + str(submit_button) + str(target_form) + " trying JavaScript click")
+                        logging.info("form_fill Javascript submission of form after failed submit button click")
 
-                        driver.execute_script("arguments[0].click()",
-                                              selenium_submit)
+                        driver.execute_script("arguments[0].click()", selenium_submit)
 
                         # Also try submitting the full form, shouldn't be needed
                         try:
                             el.submit()
                         except Exception as e:
-                            logging.info(
-                                "Could not submit form, could be good!")
+                            logging.info("Could not submit form, could be good!")
 
                     except Exception as e:
-                        logging.warning("Cannot click on submit button: " +
-                                        str(submit_button) + str(target_form))
-                        logging.info(
-                            "form_fill Javascript submission of form after failed submit button click"
-                        )
+                        logging.warning("Cannot click on submit button: " + str(submit_button) + str(target_form))
+                        logging.info("form_fill Javascript submission of form after failed submit button click")
                         el.submit()
 
                 # Some forms show an alert with a confirmation
@@ -706,9 +649,7 @@ def form_fill(driver, target_form):
                     logging.info("Removed alert: " + alertText)
                     alert.accept()
                 except:
-                    logging.info(
-                        "No alert removed (probably due to there not being any)"
-                    )
+                    logging.info("No alert removed (probably due to there not being any)")
                     pass
         else:
             logging.info("form_fill Javascript submission of form")
@@ -721,14 +662,12 @@ def form_fill(driver, target_form):
             logging.info("Removed alert: " + alertText)
             alert.accept()
         except:
-            logging.info(
-                "No alert removed (probably due to there not being any)")
+            logging.info("No alert removed (probably due to there not being any)")
 
         # End of form fill if everything went well
         return True
 
-    logging.error("error no form found (url:%s, form:%s)" %
-                  (driver.current_url, target_form))
+    logging.error("error no form found (url:%s, form:%s)" % (driver.current_url, target_form))
     return False
     #raise Exception("error no form found (url:%s, form:%s)" % (driver.current_url, target_form) )
 
@@ -751,27 +690,22 @@ def ui_form_fill(driver, target_form):
 
         if web_element.get_attribute("maxlength"):
             try:
-                driver.execute_script(
-                    "arguments[0].removeAttribute('maxlength')", web_element)
+                driver.execute_script("arguments[0].removeAttribute('maxlength')", web_element)
             except Exception as e:
-                logging.warning("[inputs] faild to change maxlength " +
-                                str(web_element))
+                logging.warning("[inputs] faild to change maxlength " + str(web_element))
 
         input_value = source['value']
         try:
             web_element.clear()
             web_element.send_keys(input_value)
         except Exception as e:
-            logging.warning("[inputs] faild to send keys to " +
-                            str(input_value) + " Trying javascript")
+            logging.warning("[inputs] faild to send keys to " + str(input_value) + " Trying javascript")
             try:
-                driver.execute_script(
-                    "arguments[0].value = '" + input_value + "'", web_element)
+                driver.execute_script("arguments[0].value = '" + input_value + "'", web_element)
             except Exception as e:
                 logging.error(e)
                 logging.error(traceback.format_exc())
-                logging.error("[inputs] also faild with JS " +
-                              str(web_element))
+                logging.error("[inputs] also faild with JS " + str(web_element))
 
     submit_element = driver.find_element_by_xpath(target_form.submit)
     submit_element.click()
@@ -918,8 +852,7 @@ def find_login_form(driver, graph, early_state=False):
             if form_input.itype == "password":
                 max_input_for_login = 10
                 if len(form.inputs) > max_input_for_login:
-                    logging.info("Too many inputs for a login form, " +
-                                 str(form))
+                    logging.info("Too many inputs for a login form, " + str(form))
                     continue
 
                 # We need to make sure that the form is part of the graph
