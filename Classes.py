@@ -571,6 +571,8 @@ class Crawler:
                 break
 
         print("Done crawling, ready to attack!")
+        with open("graph.pickle", "wb") as f:
+            pickle.dump(self.graph, f)
         self.attack()
 
     def extract_vectors(self):
@@ -678,7 +680,7 @@ class Crawler:
             # Inspect
             inspect_result = self.inspect_attack(vector_edge)
             if inspect_result:
-                successful_xss = successful_xss.union()
+                successful_xss = successful_xss.union(inspect_result)
                 logging.info("Found injection, don't test all")
                 break
 
@@ -721,7 +723,7 @@ class Crawler:
                     # Inspect
                     inspect_result = self.inspect_attack(vector)
                     if inspect_result:
-                        successful_xss = successful_xss.union()
+                        successful_xss = successful_xss.union(inspect_result)
                         logging.info("Found injection, don't test all")
                         break
 
@@ -836,6 +838,7 @@ class Crawler:
         # Save successful attacks to file
         if successful_xss:
             f = open("successful_injections-" + self.session_id + ".txt", "a+")
+            f2 = open("my_successful_xss.txt", "a+")
             for xss in successful_xss:
                 attack_entry = self.get_table_entry(xss)
                 if attack_entry:
@@ -846,6 +849,7 @@ class Crawler:
                     simple_entry = {'reflected': str(attack_entry['reflected']), 'injected': str(attack_entry['injected'])}
 
                     f.write(json.dumps(simple_entry) + "\n")
+                    f2.write(str(xss) + '\n')
 
         return successful_xss
 
@@ -903,7 +907,6 @@ class Crawler:
                 if not find_state(driver, graph, edge_in_path):
                     logging.warning("Could not enter iframe" + str(edge_in_path))
                     return False
-
                 self.inspect_attack(edge_in_path)
             elif method == "javascript":
                 # The javascript code is stored in the to-node
@@ -1065,6 +1068,8 @@ class Crawler:
         successful_xss = set()
 
         vectors = self.extract_vectors()
+        with open("vectors.pickle", "wb") as f:
+            pickle.dump(vectors, f)
 
         pprint.pprint(vectors)
 
